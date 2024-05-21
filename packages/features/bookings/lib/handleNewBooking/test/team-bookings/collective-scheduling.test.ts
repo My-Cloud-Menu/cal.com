@@ -1,15 +1,3 @@
-import type { Request, Response } from "express";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { describe, expect, beforeEach } from "vitest";
-
-import { appStoreMetadata } from "@calcom/app-store/appStoreMetaData";
-import { OrganizerDefaultConferencingAppType } from "@calcom/app-store/locations";
-import { WEBAPP_URL, WEBSITE_URL, BOOKED_WITH_SMS_EMAIL } from "@calcom/lib/constants";
-import { ErrorCode } from "@calcom/lib/errorCodes";
-import { resetTestSMS } from "@calcom/lib/testSMS";
-import { SchedulingType } from "@calcom/prisma/enums";
-import { BookingStatus } from "@calcom/prisma/enums";
-import { test } from "@calcom/web/test/fixtures/fixtures";
 import {
   createBookingScenario,
   createOrganization,
@@ -44,12 +32,13 @@ import { setupAndTeardown } from "@calcom/web/test/utils/bookingScenario/setupAn
 
 import type { Request, Response } from "express";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { describe, expect } from "vitest";
+import { describe, expect, beforeEach } from "vitest";
 
 import { appStoreMetadata } from "@calcom/app-store/appStoreMetaData";
 import { OrganizerDefaultConferencingAppType } from "@calcom/app-store/locations";
-import { WEBAPP_URL, WEBSITE_URL } from "@calcom/lib/constants";
+import { WEBAPP_URL, WEBSITE_URL, BOOKED_WITH_SMS_EMAIL } from "@calcom/lib/constants";
 import { ErrorCode } from "@calcom/lib/errorCodes";
+import { resetTestSMS } from "@calcom/lib/testSMS";
 import { SchedulingType } from "@calcom/prisma/enums";
 import { BookingStatus } from "@calcom/prisma/enums";
 import { test } from "@calcom/web/test/fixtures/fixtures";
