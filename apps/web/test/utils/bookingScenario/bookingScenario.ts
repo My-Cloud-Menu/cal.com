@@ -1516,7 +1516,7 @@ export function getMockBookingReference(
 }
 
 export function getMockBookingAttendee(
-  attendee: Omit<Attendee, "bookingId" | "phoneNumber", "email"> & {
+  attendee: Omit<Attendee, "bookingId" | "phoneNumber" | "email"> & {
     bookingSeat?: AttendeeBookingSeatInput;
     phoneNumber?: string | null;
     email?: string | null;
