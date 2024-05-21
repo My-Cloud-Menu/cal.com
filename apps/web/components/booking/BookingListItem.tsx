@@ -270,7 +270,7 @@ function BookingListItem(booking: BookingItemProps) {
     const urlSearchParams = new URLSearchParams({
       allRemainingBookings: isTabRecurring.toString(),
     });
-    if (booking.attendees[0]) urlSearchParams.set("email", booking.attendees[0].email);
+    if (booking.attendees[0].email) urlSearchParams.set("email", booking.attendees[0].email);
     return `/booking/${booking.uid}?${urlSearchParams.toString()}`;
   };
 
@@ -653,13 +653,14 @@ const FirstAttendee = ({
 
 type AttendeeProps = {
   name?: string;
-  email: string;
+  email?: string | null;
+  phoneNumber?: string | null;
 };
 
-const Attendee = ({ email, name }: AttendeeProps) => {
+const Attendee = ({ email, name, phoneNumber }: AttendeeProps) => {
   return (
     <a className="hover:text-blue-500" href={`mailto:${email}`} onClick={(e) => e.stopPropagation()}>
-      {name || email}
+      {name ?? email ?? phoneNumber}
     </a>
   );
 };

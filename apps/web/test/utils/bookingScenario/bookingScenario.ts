@@ -1516,16 +1516,17 @@ export function getMockBookingReference(
 }
 
 export function getMockBookingAttendee(
-  attendee: Omit<Attendee, "bookingId" | "phoneNumber"> & {
+  attendee: Omit<Attendee, "bookingId" | "phoneNumber", "email"> & {
     bookingSeat?: AttendeeBookingSeatInput;
     phoneNumber?: string | null;
+    email?: string | null;
   }
 ) {
   return {
     id: attendee.id,
     timeZone: attendee.timeZone,
     name: attendee.name,
-    email: attendee.email,
+    email: attendee.email ?? undefined,
     locale: attendee.locale,
     bookingSeat: attendee.bookingSeat || null,
     phoneNumber: attendee.phoneNumber ?? undefined,
