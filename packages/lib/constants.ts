@@ -154,3 +154,8 @@ export const ORG_SELF_SERVE_ENABLED = process.env.NEXT_PUBLIC_ORG_SELF_SERVE_ENA
 export const ORG_MINIMUM_PUBLISHED_TEAMS_SELF_SERVE = 2;
 
 export const BOOKED_WITH_SMS_EMAIL = "booked-with-sms@cal.com";
+/**
+ * The maximum number of days we should check for if we don't find all required bookable days
+ * Counter start from current day and we would like to not go beyond 2 months(max days possible) from current day.
+ */
+export const ROLLING_WINDOW_PERIOD_MAX_DAYS_TO_CHECK = 30 + 31;
