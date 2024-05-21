@@ -107,7 +107,7 @@ const handleSeats = async (newSeatedBookingObject: NewSeatedBookingObject) => {
         isNotConfirmed: evt.requiresConfirmation || false,
         isRescheduleEvent: !!rescheduleUid,
         isFirstRecurringEvent: true,
-        emailAttendeeSendToOverride: bookerEmail,
+        emailAttendeeSendToOverride: bookerEmail ?? undefined,
         seatReferenceUid: evt.attendeeSeatId,
       });
     } catch (error) {

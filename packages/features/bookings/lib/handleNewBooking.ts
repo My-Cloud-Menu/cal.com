@@ -125,7 +125,7 @@ export type NewBookingEventType =
 type ReqBodyWithoutEnd = z.infer<ReturnType<typeof getBookingDataSchema>>;
 type ReqBodyWithEnd = ReqBodyWithoutEnd & { end: string };
 export type Invitee = {
-  email: string;
+  email?: string;
   name: string;
   firstName: string;
   lastName: string;
@@ -473,6 +473,7 @@ async function getOriginalRescheduledBooking(uid: string, seatsEventType?: boole
           email: true,
           locale: true,
           timeZone: true,
+          phoneNumber: true,
           ...(seatsEventType && { bookingSeat: true, id: true }),
         },
       },
@@ -561,10 +562,6 @@ export async function getBookingData<T extends z.ZodType>({
       bookingFields: eventType.bookingFields,
       responses,
     });
-
-  if (!responses.email) {
-    throw new Error("Booker email in `responses` must not be nullish");
-  }
 
   return {
     ...reqBody,
@@ -1623,6 +1620,7 @@ async function handler(
       organizerUser,
       originalRescheduledBooking,
       bookerEmail,
+      bookerPhoneNumber,
       tAttendees,
       bookingSeat,
       reqUserId: req.userId,
@@ -1743,7 +1741,10 @@ async function handler(
 
     if (booking && booking.id && eventType.seatsPerTimeSlot) {
       const currentAttendee = booking.attendees.find(
-        (attendee) => attendee.email === req.body.responses.email
+        (attendee) =>
+          attendee.email === req.body.responses.email ||
+          (req.body.responses.attendeePhoneNumber &&
+            attendee.phoneNumber === req.body.responses.attendeePhoneNumber)
       );
 
       // Save description to bookingSeat
@@ -1968,6 +1969,7 @@ async function handler(
             name: user.name,
             email: user.email,
             timeZone: user.timeZone,
+            phoneNumber: user.phoneNumber,
             language: { translate, locale: user.locale ?? "en" },
           });
         }
@@ -2249,7 +2251,8 @@ async function handler(
       eventTypePaymentAppCredential as IEventTypePaymentCredentialType,
       booking,
       fullName,
-      bookerEmail
+      bookerEmail,
+      bookerPhoneNumber
     );
     const subscriberOptionsPaymentInitiated: GetSubscriberOptions = {
       userId: triggerForUser ? organizerUser.id : null,

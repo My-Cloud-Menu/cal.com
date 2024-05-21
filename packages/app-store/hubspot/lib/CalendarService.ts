@@ -13,12 +13,12 @@ import { HttpError } from "@calcom/lib/http-error";
 import logger from "@calcom/lib/logger";
 import prisma from "@calcom/prisma";
 import type {
+  Attendee,
   Calendar,
   CalendarEvent,
   EventBusyDate,
   IntegrationCalendar,
   NewCalendarEventType,
-  Person,
 } from "@calcom/types/Calendar";
 import type { CredentialPayload } from "@calcom/types/Credential";
 
@@ -48,7 +48,7 @@ export default class HubspotCalendarService implements Calendar {
     this.log = logger.getSubLogger({ prefix: [`[[lib] ${this.integrationName}`] });
   }
 
-  private hubspotContactCreate = async (attendees: Person[]) => {
+  private hubspotContactCreate = async (attendees: Attendee[]) => {
     const simplePublicObjectInputs: SimplePublicObjectInput[] = attendees.map((attendee) => {
       const [firstname, lastname] = attendee.name ? attendee.name.split(" ") : [attendee.email, ""];
       return {
@@ -56,6 +56,7 @@ export default class HubspotCalendarService implements Calendar {
           firstname,
           lastname,
           email: attendee.email,
+          phoneNumber: attendee.phoneNumber,
         },
       };
     });
