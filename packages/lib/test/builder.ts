@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import type { Booking, EventType, Prisma, Webhook } from "@prisma/client";
+import type { Booking, EventType, Prisma, Webhook, BookingReference } from "@prisma/client";
 import type { TFunction } from "next-i18next";
 
 import getICalUID from "@calcom/emails/lib/getICalUID";
@@ -45,7 +45,9 @@ const buildOrganizer = (): Organizer => {
   };
 };
 
-export const buildBooking = (booking?: Partial<Booking>): Booking => {
+export const buildBooking = (
+  booking?: Partial<Booking> & { references?: Partial<BookingReference>[] }
+): Booking & { references?: Partial<BookingReference>[] } => {
   const uid = faker.datatype.uuid();
   return {
     id: faker.datatype.number(),
