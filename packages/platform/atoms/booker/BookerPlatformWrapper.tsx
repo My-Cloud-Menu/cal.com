@@ -22,6 +22,7 @@ import type {
 } from "@calcom/platform-types";
 import { BookerLayouts } from "@calcom/prisma/zod-utils";
 
+import { transformApiEventTypeForAtom } from "../event-type/atom-api-transformers/transformApiEventTypeForAtom";
 import { useEventType } from "../hooks/event-types/useEventType";
 import { useAtomsContext } from "../hooks/useAtomsContext";
 import { useAvailableSlots } from "../hooks/useAvailableSlots";
@@ -119,6 +120,7 @@ export const BookerPlatformWrapper = (props: BookerPlatformWrapperAtomProps) => 
   }, [username]);
 
   const event = useEventType(username, props.eventSlug);
+  const atomEvent = event.data ? transformApiEventTypeForAtom(event.data) : undefined;
 
   if (isDynamic && props.duration && event.data) {
     // note(Lauris): Mandatory - In case of "dynamic" event type default event duration returned by the API is 30,
@@ -126,7 +128,7 @@ export const BookerPlatformWrapper = (props: BookerPlatformWrapperAtomProps) => 
     event.data.lengthInMinutes = props.duration;
   }
 
-  const bookerLayout = useBookerLayout(event.data);
+  const bookerLayout = useBookerLayout();
   useInitializeBookerStore({
     ...props,
     eventId: event.data?.id,
@@ -203,7 +205,7 @@ export const BookerPlatformWrapper = (props: BookerPlatformWrapperAtomProps) => 
   });
 
   const bookerForm = useBookingForm({
-    event: event.data,
+    eventBookingFields: atomEvent?.bookingFields ?? null,
     sessionEmail:
       session?.data?.email && clientId
         ? session.data.email.replace(`+${clientId}`, "")
@@ -252,7 +254,7 @@ export const BookerPlatformWrapper = (props: BookerPlatformWrapperAtomProps) => 
     onError: props.onCreateInstantBookingError,
   });
 
-  const slots = useSlots(event);
+  const slots = useSlots(atomEvent);
   const [calendarSettingsOverlay] = useOverlayCalendarStore(
     (state) => [state.calendarSettingsOverlayModal, state.setCalendarSettingsOverlayModal],
     shallow
@@ -283,8 +285,8 @@ export const BookerPlatformWrapper = (props: BookerPlatformWrapperAtomProps) => 
   });
 
   const handleBookEvent = useHandleBookEvent({
-    event,
     bookingForm: bookerForm.bookingForm,
+    event: atomEvent,
     hashedLink: props.hashedLink,
     metadata: {},
     handleBooking: props?.handleCreateBooking ?? createBooking,
@@ -300,7 +302,7 @@ export const BookerPlatformWrapper = (props: BookerPlatformWrapperAtomProps) => 
         eventSlug={props.eventSlug}
         username={username}
         entity={
-          event?.data?.entity ?? {
+          event?.entity ?? {
             considerUnpublished: false,
             orgSlug: undefined,
             teamSlug: undefined,
@@ -324,7 +326,7 @@ export const BookerPlatformWrapper = (props: BookerPlatformWrapperAtomProps) => 
         onClickOverlayContinue={function (): void {
           throw new Error("Function not implemented.");
         }}
-        onOverlaySwitchStateChange={function (state: boolean): void {
+        onOverlaySwitchStateChange={function (): void {
           throw new Error("Function not implemented.");
         }}
         extraOptions={extraOptions ?? {}}

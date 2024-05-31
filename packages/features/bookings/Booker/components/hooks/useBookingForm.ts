@@ -5,14 +5,14 @@ import { z } from "zod";
 
 import type { EventLocationType } from "@calcom/app-store/locations";
 import { useBookerStore } from "@calcom/features/bookings/Booker/store";
-import type { useEventReturnType } from "@calcom/features/bookings/Booker/utils/event";
+import type { BookingFields } from "@calcom/features/bookings/lib/getBookingResponsesSchema";
 import getBookingResponsesSchema from "@calcom/features/bookings/lib/getBookingResponsesSchema";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
 
 import { useInitialFormValues } from "./useInitialFormValues";
 
 export interface IUseBookingForm {
-  event: useEventReturnType["data"];
+  eventBookingFields: BookingFields | undefined;
   sessionEmail?: string | null;
   sessionName?: string | null;
   sessionUsername?: string | null;
@@ -27,7 +27,7 @@ export interface IUseBookingForm {
 export type UseBookingFormReturnType = ReturnType<typeof useBookingForm>;
 
 export const useBookingForm = ({
-  event,
+  eventBookingFields,
   sessionEmail,
   sessionName,
   sessionUsername,
@@ -42,9 +42,9 @@ export const useBookingForm = ({
 
   const bookingFormSchema = z
     .object({
-      responses: event
+      responses: eventBookingFields
         ? getBookingResponsesSchema({
-            bookingFields: event.bookingFields,
+            bookingFields: eventBookingFields,
             view: rescheduleUid ? "reschedule" : "booking",
           })
         : // Fallback until event is loaded.
@@ -62,7 +62,7 @@ export const useBookingForm = ({
   const isRescheduling = !!rescheduleUid && !!bookingData;
 
   const { initialValues, key } = useInitialFormValues({
-    eventType: event,
+    eventBookingFields,
     rescheduleUid,
     isRescheduling,
     email: sessionEmail,

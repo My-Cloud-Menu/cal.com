@@ -20,7 +20,7 @@ export const useEventType = (username: string, eventSlug: string) => {
   const requestUsername = stateUsername ?? username;
   const requestEventSlug = stateEventSlug ?? eventSlug;
 
-  const event = useQuery({
+  const eventQuery = useQuery({
     queryKey: [QUERY_KEY, stateUsername ?? username, stateEventSlug ?? eventSlug],
     queryFn: () => {
       return http
@@ -36,5 +36,5 @@ export const useEventType = (username: string, eventSlug: string) => {
     },
   });
 
-  return event;
+  return eventQuery;
 };

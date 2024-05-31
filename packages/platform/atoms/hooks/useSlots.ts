@@ -4,7 +4,6 @@ import { shallow } from "zustand/shallow";
 import dayjs from "@calcom/dayjs";
 import { useBookerStore } from "@calcom/features/bookings/Booker/store";
 import { useSlotReservationId } from "@calcom/features/bookings/Booker/useSlotReservationId";
-import type { useEventReturnType } from "@calcom/features/bookings/Booker/utils/event";
 import { MINUTES_TO_BOOK } from "@calcom/lib/constants";
 
 import { useDeleteSelectedSlot } from "./useDeleteSelectedSlot";
@@ -12,7 +11,12 @@ import { useReserveSlot } from "./useReserveSlot";
 
 export type UseSlotsReturnType = ReturnType<typeof useSlots>;
 
-export const useSlots = (event: useEventReturnType) => {
+type EventProp = {
+  id: number;
+  length: number;
+};
+
+export const useSlots = (event: EventProp | undefined | null) => {
   const selectedDuration = useBookerStore((state) => state.selectedDuration);
   const [selectedTimeslot, setSelectedTimeslot] = useBookerStore(
     (state) => [state.selectedTimeslot, state.setSelectedTimeslot],
@@ -27,18 +31,18 @@ export const useSlots = (event: useEventReturnType) => {
 
   const removeSelectedSlot = useDeleteSelectedSlot();
   const handleRemoveSlot = () => {
-    if (event?.data) {
+    if (event) {
       removeSelectedSlot.mutate({ uid: slotReservationId ?? undefined });
     }
   };
   const handleReserveSlot = () => {
-    if (event?.data?.id && selectedTimeslot && (selectedDuration || event?.data?.length)) {
+    if (event?.id && selectedTimeslot && (selectedDuration || event?.length)) {
       reserveSlotMutation.mutate({
         slotUtcStartDate: dayjs(selectedTimeslot).utc().format(),
-        eventTypeId: event.data.id,
+        eventTypeId: event.id,
         slotUtcEndDate: dayjs(selectedTimeslot)
           .utc()
-          .add(selectedDuration || event.data.length, "minutes")
+          .add(selectedDuration || event.length, "minutes")
           .format(),
       });
     }
@@ -58,7 +62,7 @@ export const useSlots = (event: useEventReturnType) => {
       clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [event?.data?.id, timeslot]);
+  }, [event?.id, timeslot]);
 
   return {
     selectedTimeslot,

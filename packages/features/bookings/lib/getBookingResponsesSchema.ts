@@ -7,7 +7,7 @@ import { bookingResponses, emailSchemaRefinement } from "@calcom/prisma/zod-util
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type View = ALL_VIEWS | (string & {});
-type BookingFields = (z.infer<typeof eventTypeBookingFields> & z.BRAND<"HAS_SYSTEM_FIELDS">) | null;
+export type BookingFields = (z.infer<typeof eventTypeBookingFields> & z.BRAND<"HAS_SYSTEM_FIELDS">) | null;
 type CommonParams = { bookingFields: BookingFields; view: View };
 
 export const bookingResponse = dbReadResponseSchema;

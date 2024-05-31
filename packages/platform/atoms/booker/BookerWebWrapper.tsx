@@ -29,7 +29,7 @@ export const BookerWebWrapper = (props: BookerWebWrapperAtomProps) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const event = useEvent();
-  const bookerLayout = useBookerLayout(event.data);
+  const bookerLayout = useBookerLayout(event.data?.profile?.bookerLayouts);
 
   const selectedDate = searchParams?.get("date");
   const isRedirect = searchParams?.get("redirected") === "true" || false;
@@ -79,7 +79,7 @@ export const BookerWebWrapper = (props: BookerWebWrapperAtomProps) => {
   }, [searchParams, firstNameQueryParam, lastNameQueryParam]);
 
   const bookerForm = useBookingForm({
-    event: event.data,
+    eventBookingFields: event.data?.bookingFields,
     sessionEmail: session?.user.email,
     sessionUsername: session?.user.username,
     sessionName: session?.user.name,

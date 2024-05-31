@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import type { z } from "zod";
 
 import { useBookerStore } from "@calcom/features/bookings/Booker/store";
-import type { useEvent } from "@calcom/features/bookings/Booker/utils/event";
 import type getBookingResponsesSchema from "@calcom/features/bookings/lib/getBookingResponsesSchema";
+import type { BookingFields } from "@calcom/features/bookings/lib/getBookingResponsesSchema";
 import { getBookingResponsesPartialSchema } from "@calcom/features/bookings/lib/getBookingResponsesSchema";
 
 export type useInitialFormValuesReturnType = ReturnType<typeof useInitialFormValues>;
 
 type UseInitialFormValuesProps = {
-  eventType: ReturnType<typeof useEvent>["data"];
+  eventBookingFields: BookingFields | undefined;
   rescheduleUid: string | null;
   isRescheduling: boolean;
   email?: string | null;
@@ -24,7 +24,7 @@ type UseInitialFormValuesProps = {
 };
 
 export function useInitialFormValues({
-  eventType,
+  eventBookingFields,
   rescheduleUid,
   isRescheduling,
   email,
@@ -47,11 +47,11 @@ export function useInitialFormValues({
         return;
       }
 
-      if (!eventType?.bookingFields) {
+      if (!eventBookingFields) {
         return {};
       }
       const querySchema = getBookingResponsesPartialSchema({
-        bookingFields: eventType.bookingFields,
+        bookingFields: eventBookingFields,
         view: rescheduleUid ? "reschedule" : "booking",
       });
 
@@ -83,7 +83,7 @@ export function useInitialFormValues({
           responses: {} as Partial<z.infer<ReturnType<typeof getBookingResponsesSchema>>>,
         };
 
-        const responses = eventType.bookingFields.reduce((responses, field) => {
+        const responses = eventBookingFields.reduce((responses, field) => {
           return {
             ...responses,
             [field.name]: parsedQuery[field.name] || undefined,
@@ -110,7 +110,7 @@ export function useInitialFormValues({
         bookingId: bookingData?.id,
       };
 
-      const responses = eventType.bookingFields.reduce((responses, field) => {
+      const responses = eventBookingFields.reduce((responses, field) => {
         return {
           ...responses,
           [field.name]: bookingData?.responses[field.name],
@@ -126,7 +126,7 @@ export function useInitialFormValues({
     // do not add extraOptions as a dependency, it will cause infinite loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    eventType?.bookingFields,
+    eventBookingFields,
     formValues,
     isRescheduling,
     bookingData,

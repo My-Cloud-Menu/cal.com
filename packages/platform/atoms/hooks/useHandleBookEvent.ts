@@ -1,19 +1,29 @@
 import type { UseBookingFormReturnType } from "@calcom/features/bookings/Booker/components/hooks/useBookingForm";
 import { useBookerStore } from "@calcom/features/bookings/Booker/store";
-import type { useEventReturnType } from "@calcom/features/bookings/Booker/utils/event";
 import {
   useTimePreferences,
   mapBookingToMutationInput,
   mapRecurringBookingToMutationInput,
 } from "@calcom/features/bookings/lib";
 import { useLocale } from "@calcom/lib/hooks/useLocale";
-import type { BookingCreateBody } from "@calcom/prisma/zod-utils";
+import type { BookingCreateBody, Frequency } from "@calcom/prisma/zod-utils";
 
 import type { UseCreateBookingInput } from "./useCreateBooking";
 
+type Event = {
+  isDynamic: boolean;
+  length: number;
+  metadata?: {
+    multipleDuration?: number[];
+  };
+  recurringEvent?: {
+    freq: Frequency;
+  };
+};
+
 type UseHandleBookingProps = {
   bookingForm: UseBookingFormReturnType["bookingForm"];
-  event: useEventReturnType;
+  event: Event;
   metadata: Record<string, string>;
   hashedLink?: string | null;
   handleBooking: (input: UseCreateBookingInput) => void;
@@ -61,16 +71,16 @@ export const useHandleBookEvent = ({
 
       // Ensures that duration is an allowed value, if not it defaults to the
       // default event duration.
-      const validDuration = event.data.isDynamic
-        ? duration || event.data.length
-        : duration && event.data.metadata?.multipleDuration?.includes(duration)
+      const validDuration = event.isDynamic
+        ? duration || event.length
+        : duration && event.metadata?.multipleDuration?.includes(duration)
         ? duration
-        : event.data.length;
+        : event.length;
 
       const bookingInput = {
         values,
         duration: validDuration,
-        event: event.data,
+        event,
         date: timeslot,
         timeZone: timezone,
         language: i18n.language,
@@ -84,7 +94,7 @@ export const useHandleBookEvent = ({
 
       if (isInstantMeeting) {
         handleInstantBooking(mapBookingToMutationInput(bookingInput));
-      } else if (event.data?.recurringEvent?.freq && recurringEventCount && !rescheduleUid) {
+      } else if (event.recurringEvent?.freq && recurringEventCount && !rescheduleUid) {
         handleRecBooking(mapRecurringBookingToMutationInput(bookingInput, recurringEventCount));
       } else {
         handleBooking({ ...mapBookingToMutationInput(bookingInput), locationUrl });
