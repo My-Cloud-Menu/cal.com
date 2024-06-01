@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 import { test } from "@calcom/web/playwright/lib/fixtures";
 
@@ -24,6 +25,9 @@ test.describe("Inline Iframe", () => {
     if (!embedIframe) {
       throw new Error("Embed iframe not found");
     }
+
+    verifyNoRequestIsBlocked(page);
+
     await bookFirstEvent("pro", embedIframe, page);
     await deleteAllBookingsByEmail("embed-user@example.com");
   });
@@ -34,3 +38,12 @@ test.describe("Inline Iframe", () => {
 
   todo("Check that UI Configuration doesn't work for Free Plan");
 });
+
+function verifyNoRequestIsBlocked(page: Page) {
+  page.on("requestfailed", (request) => {
+    const error = request.failure()?.errorText;
+    if (error?.includes("ERR_BLOCKED_BY_RESPONSE")) {
+      throw new Error(`Request Blocked: ${request.url()}`);
+    }
+  });
+}
